@@ -15,16 +15,17 @@ export default function Sidebar({ navLinks }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const sidebarItems = [
-    { label: "Home", href: "/", icon: "🏠" },
-    { label: "Chronicles", href: "/chronicles", icon: "📰" },
-    { label: "Founders", href: "/founders", icon: "👤" },
-    { label: "Magazines", href: "/magazines", icon: "📚" },
-    { label: "Research", href: "/research", icon: "🔬" },
-    { label: "Investors", href: "/investors", icon: "💼" },
-    { label: "Opportunities", href: "/opportunities", icon: "🚀" },
-    { label: "College Collabs", href: "/college-collabs", icon: "🎓" },
-    { label: "Submit Story", href: "/submit-story", icon: "✍️" },
-    { label: "About Us", href: "/about", icon: "ℹ️" },
+    { icon: "🏠", label: "Home", href: "/" },
+    { icon: "📰", label: "Chronicles", href: "/chronicles" },
+    { icon: "�", label: "Founders", href: "/founders" },
+    { icon: "�", label: "Magazines", href: "/magazines" },
+    { icon: "�", label: "Research", href: "/research" },
+    { icon: "�", label: "Investors", href: "/investors" },
+    { icon: "🌟", label: "Opportunities", href: "/opportunities" },
+    { icon: "🎓", label: "College Collabs", href: "/college-collabs" },
+    { icon: "ℹ️", label: "About Us", href: "/about" },
+    { icon: "🏆", label: "Rewards", href: "/rewards" },
+    { icon: "🔒", label: "Admin", href: "/admin" },
   ];
 
   return (
@@ -157,8 +158,29 @@ export default function Sidebar({ navLinks }: SidebarProps) {
               </nav>
 
               <div className="p-4 border-t border-white/10">
-                <div className="text-xs text-zinc-400 text-center">
-                  © 2024 ARK Chronicles
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/submit-story"
+                    onClick={() => setIsMobileOpen(false)}
+                    className="rounded-full border border-white/20 px-4 py-3 text-center text-sm font-medium text-white transition-all duration-150 hover:border-white hover:bg-white/10"
+                  >
+                    Submit Story
+                  </Link>
+                  <Link
+                    href="#"
+                    onClick={() => setIsMobileOpen(false)}
+                    className="rounded-full border border-white/20 px-4 py-3 text-center text-sm font-medium text-white transition-all duration-150 hover:border-white hover:bg-white/10"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="#"
+                    onClick={() => setIsMobileOpen(false)}
+                    className="rounded-full px-4 py-3 text-center text-sm font-semibold text-white transition-all duration-150 hover:scale-105"
+                    style={{ backgroundColor: "#D4A017", color: "#1B2A6B", fontWeight: 700 }}
+                  >
+                    Join Ark
+                  </Link>
                 </div>
               </div>
             </motion.aside>

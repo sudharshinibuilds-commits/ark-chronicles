@@ -26,6 +26,20 @@ function ArkWordmark() {
   );
 }
 
+const menuItems = [
+  { icon: "🏠", label: "Home", href: "/" },
+  { icon: "📰", label: "Chronicles", href: "/chronicles" },
+  { icon: "👤", label: "Founders", href: "/founders" },
+  { icon: "📚", label: "Magazines", href: "/magazines" },
+  { icon: "🔬", label: "Research", href: "/research" },
+  { icon: "💼", label: "Investors", href: "/investors" },
+  { icon: "🌟", label: "Opportunities", href: "/opportunities" },
+  { icon: "🎓", label: "College Collabs", href: "/college-collabs" },
+  { icon: "ℹ️", label: "About Us", href: "/about" },
+  { icon: "🏆", label: "Rewards", href: "/rewards" },
+  { icon: "🔒", label: "Admin", href: "/admin" },
+];
+
 export default function Header({
   currentDate,
   navLinks,
@@ -57,26 +71,35 @@ export default function Header({
 
       <div className="border-b border-black/8 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <Link
-            href="#"
-            className="transition-transform duration-150 hover:scale-[1.02]"
-          >
-            <ArkWordmark />
-          </Link>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => setMenuOpen((open) => !open)}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 text-ark-black transition-all duration-150 hover:scale-105 hover:border-ark-navy hover:text-ark-navy"
+              aria-expanded={menuOpen}
+              aria-label="Toggle navigation menu"
+            >
+              <div className="flex flex-col gap-1.5">
+                <span className="h-0.5 w-5 bg-current" />
+                <span className="h-0.5 w-5 bg-current" />
+                <span className="h-0.5 w-5 bg-current" />
+              </div>
+            </button>
+            <Link
+              href="/"
+              className="transition-transform duration-150 hover:scale-[1.02]"
+            >
+              <ArkWordmark />
+            </Link>
+          </div>
 
-          <nav className="hidden flex-1 items-center justify-center gap-6 lg:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-sm font-medium text-ark-black transition-all duration-150 hover:scale-105 hover:text-ark-navy"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/submit-story"
+              className="hidden sm:block rounded-full border border-ark-navy/20 px-4 py-2 text-sm font-medium text-ark-navy transition-all duration-150 hover:scale-105 hover:border-ark-navy hover:bg-ark-navy/5"
+            >
+              Submit Story
+            </Link>
             <Link
               href="#"
               className="rounded-full border border-ark-navy/20 px-4 py-2 text-sm font-medium text-ark-navy transition-all duration-150 hover:scale-105 hover:border-ark-navy hover:bg-ark-navy/5"
@@ -86,76 +109,97 @@ export default function Header({
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
               <Link
                 href="#"
-                className="rounded-full bg-ark-navy px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-ark-navy/20 transition-colors duration-150 hover:bg-[#22378c]"
+                className="rounded-full px-5 py-2.5 text-sm font-semibold shadow-lg transition-all duration-150 hover:scale-105"
+                style={{ backgroundColor: "#1B2A6B", color: "#FFFFFF", fontWeight: 700 }}
               >
                 Join Ark
               </Link>
             </motion.div>
           </div>
-
-          <button
-            type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 text-ark-black transition-all duration-150 hover:scale-105 hover:border-ark-navy hover:text-ark-navy lg:hidden"
-            aria-expanded={menuOpen}
-            aria-label="Toggle navigation menu"
-          >
-            <div className="flex flex-col gap-1.5">
-              <span className="h-0.5 w-5 bg-current" />
-              <span className="h-0.5 w-5 bg-current" />
-              <span className="h-0.5 w-5 bg-current" />
-            </div>
-          </button>
         </div>
       </div>
 
       <AnimatePresence>
         {menuOpen ? (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="overflow-hidden border-b border-black/8 bg-white lg:hidden"
-          >
-            <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
-              <div className="flex flex-col gap-4">
-                {navLinks.map((link) => (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMenuOpen(false)}
+              className="fixed inset-0 bg-black/50 z-40"
+            />
+            <motion.div
+              initial={{ x: -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed left-0 top-0 h-full w-80 z-50 overflow-y-auto"
+              style={{ backgroundColor: "#1B2A6B" }}
+            >
+              <div className="flex items-center justify-between p-4 border-b border-white/10">
+                <div>
+                  <div className="font-display text-lg font-black uppercase tracking-wider text-white">
+                    <span style={{ color: "#D4A017" }}>A.R.K</span>
+                  </div>
+                  <div className="text-[9px] font-black uppercase tracking-wider text-zinc-400" style={{ letterSpacing: "2px" }}>
+                    CHRONICLES
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-full p-2 text-white transition-all duration-150 hover:bg-white/10"
+                  aria-label="Close navigation"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <nav className="py-4">
+                {menuItems.map((item) => (
                   <Link
-                    key={link.label}
-                    href={link.href}
+                    key={item.href}
+                    href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className="text-sm font-medium text-ark-black transition-colors duration-150 hover:text-ark-navy"
+                    className="flex items-center gap-3 px-4 py-3 text-white transition-all duration-150 hover:bg-white/10"
                   >
-                    {link.label}
+                    <span className="text-xl">{item.icon}</span>
+                    <span className="text-sm font-medium">{item.label}</span>
                   </Link>
                 ))}
-              </div>
+              </nav>
 
-              <div className="mt-6 flex flex-col gap-3 border-t border-black/8 pt-4">
-                <Link
-                  href="#"
-                  className="rounded-full border border-ark-navy/20 px-4 py-3 text-center text-sm font-medium text-ark-navy transition-all duration-150 hover:border-ark-navy hover:bg-ark-navy/5"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="#"
-                  className="rounded-full bg-ark-navy px-4 py-3 text-center text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#22378c]"
-                >
-                  Join Ark
-                </Link>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-3 border-t border-black/8 pt-4 text-xs text-zinc-500 sm:hidden">
-                {cityLinks.map((city) => (
-                  <Link key={city.label} href={city.href}>
-                    {city.label}
+              <div className="p-4 border-t border-white/10">
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/submit-story"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-full border border-white/20 px-4 py-3 text-center text-sm font-medium text-white transition-all duration-150 hover:border-white hover:bg-white/10"
+                  >
+                    Submit Story
                   </Link>
-                ))}
+                  <Link
+                    href="#"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-full border border-white/20 px-4 py-3 text-center text-sm font-medium text-white transition-all duration-150 hover:border-white hover:bg-white/10"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="#"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-full px-4 py-3 text-center text-sm font-semibold text-white transition-all duration-150 hover:scale-105"
+                    style={{ backgroundColor: "#D4A017", color: "#1B2A6B", fontWeight: 700 }}
+                  >
+                    Join Ark
+                  </Link>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         ) : null}
       </AnimatePresence>
     </header>
