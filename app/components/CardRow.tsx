@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useRef } from "react";
 
-import type { ArticleCard, FounderCard } from "./homepageData";
+import type { ArticleCard, FounderCard, MagazineCard } from "./homepageData";
 
 type CardRowProps =
   | {
@@ -21,6 +21,13 @@ type CardRowProps =
       seeAllHref: string;
       variant: "founder";
       items: FounderCard[];
+    }
+  | {
+      id: string;
+      title: string;
+      seeAllHref: string;
+      variant: "magazine";
+      items: MagazineCard[];
     };
 
 function IconButton({
@@ -131,6 +138,9 @@ export default function CardRow(props: CardRowProps) {
     if (props.variant === "founder") {
       return 296;
     }
+    if (props.variant === "magazine") {
+      return 240;
+    }
 
     return 364;
   }, [props.variant]);
@@ -216,7 +226,8 @@ export default function CardRow(props: CardRowProps) {
                   </div>
                 </motion.article>
               ))
-            : props.items.map((item, index) => (
+            : props.variant === "founder"
+            ? (props.items as FounderCard[]).map((item, index) => (
                 <motion.article
                   key={item.id}
                   initial={{ opacity: 0, y: 14 }}
@@ -261,6 +272,58 @@ export default function CardRow(props: CardRowProps) {
                     <span className="rounded-full bg-ark-gold px-3 py-1.5 text-xs font-semibold text-ark-navy">
                       {item.strikeRate}
                     </span>
+                  </div>
+                </motion.article>
+              ))
+            : (props.items as MagazineCard[]).map((item, index) => (
+                <motion.article
+                  key={item.id}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{
+                    duration: 0.32,
+                    ease: "easeOut",
+                    delay: index * 0.04,
+                  }}
+                  whileHover={{ y: -6, scale: 1.03 }}
+                  className="relative h-[400px] w-[200px] shrink-0 snap-start overflow-hidden rounded-[1.6rem] bg-white shadow-[0_20px_55px_rgba(10,10,10,0.12)] sm:w-[240px]"
+                >
+                  <div className="relative h-[280px] w-full overflow-hidden">
+                    <Image
+                      src={`https://picsum.photos/seed/${item.imageSeed}/300/400`}
+                      alt={item.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 80vw, 240px"
+                    />
+                    <div className="absolute top-3 left-3">
+                      <span className="inline-flex rounded-full bg-ark-gold px-2 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-ark-navy">
+                        {item.edition}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="mb-2 inline-flex rounded-full bg-ark-navy px-2 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white">
+                      {item.category}
+                    </div>
+                    <h3 className="font-display text-lg font-bold text-ark-black leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-xs text-zinc-600">{item.month} {item.year}</p>
+                    <p className="mt-2 text-xs text-zinc-500 line-clamp-2">{item.description}</p>
+                    <button
+                      type="button"
+                      className="mt-3 w-full rounded-full bg-ark-gold px-3 py-2 text-xs font-semibold text-ark-navy transition-all duration-150 hover:scale-105"
+                    >
+                      Read Now
+                    </button>
+                    <button
+                      type="button"
+                      className="mt-2 w-full rounded-full border border-ark-navy/20 px-3 py-2 text-xs font-semibold text-ark-navy transition-all duration-150 hover:scale-105 hover:border-ark-navy"
+                    >
+                      Download PDF
+                    </button>
                   </div>
                 </motion.article>
               ))}

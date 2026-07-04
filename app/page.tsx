@@ -12,6 +12,7 @@ import {
   heroContent,
   heroInsights,
   investorSpotlights,
+  magazines,
   navLinks,
   opportunities,
   researchPapers,
@@ -62,6 +63,13 @@ export default function Home() {
         seeAllHref="#"
         variant="article"
         items={investorSpotlights}
+      />
+      <CardRow
+        id="magazines"
+        title="Magazines"
+        seeAllHref="/magazines"
+        variant="magazine"
+        items={magazines}
       />
       <CardRow
         id="opportunities"

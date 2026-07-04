@@ -15,13 +15,11 @@ type HeaderProps = {
 function ArkWordmark() {
   return (
     <div className="leading-tight">
-      <div className="font-display text-xl font-bold uppercase tracking-[0.22em] sm:text-2xl">
-        <span className="text-ark-gold">A.</span>
-        <span className="text-ark-navy">R.</span>
-        <span className="text-ark-gold">K</span>
+      <div className="font-display text-xl font-black uppercase tracking-[0.22em] sm:text-2xl" style={{ fontWeight: 900 }}>
+        <span className="text-ark-gold" style={{ color: "#D4A017" }}>A.R.K</span>
         <span className="ml-3 text-ark-black">CHRONICLES</span>
       </div>
-      <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.36em] text-zinc-500 sm:text-[11px]">
+      <div className="mt-1 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 sm:text-[9px]" style={{ fontWeight: 900, letterSpacing: "2px" }}>
         Architects of Rising Knowledge
       </div>
     </div>

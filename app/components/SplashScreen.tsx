@@ -2,14 +2,6 @@
 
 import { motion } from "framer-motion";
 
-const brandLetters = [
-  { value: "A", className: "text-ark-black" },
-  { value: ".", className: "text-ark-black" },
-  { value: "R", className: "text-ark-navy" },
-  { value: ".", className: "text-ark-black" },
-  { value: "K", className: "text-ark-black" },
-];
-
 const bookPaths = [
   "M24 84C44 72 64 70 88 76",
   "M22 94C46 84 66 82 90 88",
@@ -36,7 +28,7 @@ function SunriseBookMark() {
       className="h-32 w-44 sm:h-36 sm:w-48"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ delay: 0.7, duration: 0.3 }}
+      transition={{ delay: 1, duration: 0.3 }}
     >
       {bookPaths.map((path, index) => (
         <motion.path
@@ -49,8 +41,8 @@ function SunriseBookMark() {
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{
-            delay: 0.75 + index * 0.06,
-            duration: 0.28,
+            delay: 1.05 + index * 0.08,
+            duration: 0.2,
             ease: "easeOut",
           }}
         />
@@ -64,7 +56,7 @@ function SunriseBookMark() {
         strokeLinecap="round"
         initial={{ pathLength: 0, opacity: 0 }}
         animate={{ pathLength: 1, opacity: 1 }}
-        transition={{ delay: 1.08, duration: 0.24, ease: "easeOut" }}
+        transition={{ delay: 1.4, duration: 0.2, ease: "easeOut" }}
       />
 
       {sunRays.map((ray, index) => (
@@ -78,8 +70,8 @@ function SunriseBookMark() {
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{
-            delay: 1.05 + index * 0.08,
-            duration: 0.22,
+            delay: 1.5 + index * 0.1,
+            duration: 0.2,
             ease: "easeOut",
           }}
         />
@@ -93,7 +85,7 @@ function SunriseBookMark() {
         strokeLinecap="round"
         initial={{ pathLength: 0, opacity: 0 }}
         animate={{ pathLength: 1, opacity: 1 }}
-        transition={{ delay: 1.62, duration: 0.32, ease: "easeOut" }}
+        transition={{ delay: 1.9, duration: 0.3, ease: "easeOut" }}
       />
     </motion.svg>
   );
@@ -109,21 +101,51 @@ export default function SplashScreen() {
     >
       <div className="flex max-w-3xl flex-col items-center text-center">
         <div className="flex items-end gap-1 sm:gap-2">
-          {brandLetters.map((letter, index) => (
-            <motion.span
-              key={`${letter.value}-${index}`}
-              className={`font-display text-[56px] font-bold leading-none sm:text-[72px] ${letter.className}`}
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                delay: index * 0.15,
-                duration: 0.22,
-                ease: "easeOut",
-              }}
-            >
-              {letter.value}
-            </motion.span>
-          ))}
+          <motion.span
+            className="font-display text-[72px] font-black leading-none sm:text-[80px] text-ark-black"
+            initial={{ x: -300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0, duration: 0.4, ease: "easeOut" }}
+          >
+            A
+          </motion.span>
+          
+          <motion.span
+            className="font-display text-[72px] font-black leading-none sm:text-[80px] text-ark-black"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15, duration: 0.2 }}
+          >
+            .
+          </motion.span>
+
+          <motion.span
+            className="font-display text-[72px] font-black leading-none sm:text-[80px] text-ark-navy"
+            style={{ color: "#1B2A6B" }}
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.4, ease: "easeOut" }}
+          >
+            R
+          </motion.span>
+
+          <motion.span
+            className="font-display text-[72px] font-black leading-none sm:text-[80px] text-ark-black"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.45, duration: 0.2 }}
+          >
+            .
+          </motion.span>
+
+          <motion.span
+            className="font-display text-[72px] font-black leading-none sm:text-[80px] text-ark-black"
+            initial={{ x: -300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.4, ease: "easeOut" }}
+          >
+            K
+          </motion.span>
         </div>
 
         <div className="mt-6">
@@ -131,23 +153,30 @@ export default function SplashScreen() {
         </div>
 
         <motion.p
-          className="mt-4 text-xl font-semibold tracking-[0.5em] text-ark-black sm:text-2xl"
+          className="mt-4 font-display text-[48px] font-black tracking-normal sm:text-[52px]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.9, duration: 0.3, ease: "easeOut" }}
+          transition={{ delay: 2, duration: 0.3, ease: "easeOut" }}
         >
-          CHRONICLE
+          <span className="text-ark-black">A</span>
+          <span className="text-ark-black">.</span>
+          <span className="text-ark-navy" style={{ color: "#1B2A6B" }}>R</span>
+          <span className="text-ark-black">.</span>
+          <span className="text-ark-black">K</span>
+          <span className="text-ark-black"> </span>
+          <span className="text-ark-black">CHRONICLE</span>
         </motion.p>
 
         <motion.div
-          className="mt-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.45em] text-ark-navy sm:text-xs"
+          className="mt-4 flex items-center gap-3 text-[14px] font-black uppercase tracking-[0.18em] text-ark-navy sm:text-[14px]"
+          style={{ color: "#1B2A6B", letterSpacing: "3px" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 2.2, duration: 0.35, ease: "easeOut" }}
+          transition={{ delay: 2.3, duration: 0.3, ease: "easeOut" }}
         >
-          <span className="h-px w-10 bg-ark-navy/40 sm:w-16" />
+          <span className="h-px w-10 bg-ark-gold sm:w-16" style={{ backgroundColor: "#D4A017" }} />
           <span>Architects of Rising Knowledge</span>
-          <span className="h-px w-10 bg-ark-navy/40 sm:w-16" />
+          <span className="h-px w-10 bg-ark-gold sm:w-16" style={{ backgroundColor: "#D4A017" }} />
         </motion.div>
       </div>
     </motion.div>

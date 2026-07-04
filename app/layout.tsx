@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 
+import Sidebar from "./components/Sidebar";
 import SplashScreenGate from "./components/SplashScreenGate";
+import { navLinks } from "./components/homepageData";
 import "./globals.css";
 
 const inter = Inter({
@@ -30,7 +32,12 @@ export default function RootLayout({
       className={`${inter.variable} ${playfairDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-white font-sans text-ark-black">
-        <SplashScreenGate>{children}</SplashScreenGate>
+        <Sidebar navLinks={navLinks} />
+        <SplashScreenGate>
+          <div className="lg:pl-64">
+            {children}
+          </div>
+        </SplashScreenGate>
       </body>
     </html>
   );

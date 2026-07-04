@@ -26,6 +26,18 @@ export type FounderCard = {
   strikeRate: string;
 };
 
+export type MagazineCard = {
+  id: string;
+  category: string;
+  title: string;
+  author: string;
+  imageSeed: string;
+  edition: string;
+  month: string;
+  year: string;
+  description: string;
+};
+
 export type HeroInsight = {
   id: string;
   label: string;
@@ -37,9 +49,11 @@ export const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "Chronicles", href: "/chronicles" },
   { label: "Founders", href: "/founders" },
+  { label: "Magazines", href: "/magazines" },
   { label: "Research", href: "/research" },
   { label: "Investors", href: "/investors" },
   { label: "Opportunities", href: "/opportunities" },
+  { label: "College Collabs", href: "/college-collabs" },
   { label: "Submit Story", href: "/submit-story" },
   { label: "About Us", href: "/about" },
 ];
@@ -255,5 +269,74 @@ export const researchPapers: ArticleCard[] = [
     title: "Trust, talent, and time-to-value: what keeps enterprise buyers leaning in.",
     author: "Sonia Mehta",
     imageSeed: "ark-research-4",
+  },
+];
+
+export const magazines: MagazineCard[] = [
+  {
+    id: "mag-1",
+    category: "Startup",
+    title: "The Founder's Playbook",
+    author: "ARK Editorial Team",
+    imageSeed: "ark-mag-1",
+    edition: "Edition 1",
+    month: "January",
+    year: "2024",
+    description: "Essential strategies for first-time founders navigating India's startup ecosystem.",
+  },
+  {
+    id: "mag-2",
+    category: "Tech",
+    title: "AI Revolution",
+    author: "ARK Editorial Team",
+    imageSeed: "ark-mag-2",
+    edition: "Edition 2",
+    month: "February",
+    year: "2024",
+    description: "How artificial intelligence is transforming Indian industries and creating new opportunities.",
+  },
+  {
+    id: "mag-3",
+    category: "Research",
+    title: "Climate Tech Frontier",
+    author: "ARK Editorial Team",
+    imageSeed: "ark-mag-3",
+    edition: "Edition 3",
+    month: "March",
+    year: "2024",
+    description: "Deep dive into climate technology startups and their impact on sustainable development.",
+  },
+  {
+    id: "mag-4",
+    category: "Tech",
+    title: "Fintech Disruption",
+    author: "ARK Editorial Team",
+    imageSeed: "ark-mag-4",
+    edition: "Edition 4",
+    month: "April",
+    year: "2024",
+    description: "The future of financial technology in India's rapidly evolving digital landscape.",
+  },
+  {
+    id: "mag-5",
+    category: "Startup",
+    title: "HealthTech Innovation",
+    author: "ARK Editorial Team",
+    imageSeed: "ark-mag-5",
+    edition: "Edition 5",
+    month: "May",
+    year: "2024",
+    description: "Revolutionary healthcare technologies changing patient care across India.",
+  },
+  {
+    id: "mag-6",
+    category: "Special Edition",
+    title: "Special Edition: Women in Tech",
+    author: "ARK Editorial Team",
+    imageSeed: "ark-mag-6",
+    edition: "Special",
+    month: "June",
+    year: "2024",
+    description: "Celebrating women leaders who are shaping India's technology landscape.",
   },
 ];

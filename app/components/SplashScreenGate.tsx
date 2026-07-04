@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import SplashScreen from "./SplashScreen";
 
 const SESSION_KEY = "ark-chronicles-splash-played";
-const SPLASH_DURATION_MS = 3000;
+const SPLASH_DURATION_MS = 3500;
 
 type SplashScreenGateProps = {
   children: React.ReactNode;
