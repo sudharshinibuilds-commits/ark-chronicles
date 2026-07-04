@@ -159,10 +159,10 @@ export default function CardRow(props: CardRowProps) {
   return (
     <section
       id={props.id}
-      className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-7"
+      className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8"
     >
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <h2 className="font-display text-3xl font-bold text-ark-black">
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h2 className="font-display text-2xl font-bold text-ark-black">
           {props.title}
         </h2>
         <Link
@@ -194,7 +194,7 @@ export default function CardRow(props: CardRowProps) {
                     delay: index * 0.04,
                   }}
                   whileHover={{ y: -6, scale: 1.03 }}
-                  className="relative h-[420px] w-[300px] shrink-0 snap-start overflow-hidden rounded-[1.6rem] bg-ark-black shadow-[0_20px_55px_rgba(10,10,10,0.12)] sm:w-[364px]"
+                  className="relative h-[320px] w-[280px] shrink-0 snap-start overflow-hidden rounded-[1.6rem] bg-ark-black shadow-[0_20px_55px_rgba(10,10,10,0.12)] sm:w-[340px]"
                 >
                   <Image
                     src={`https://picsum.photos/seed/${item.imageSeed}/600/400`}

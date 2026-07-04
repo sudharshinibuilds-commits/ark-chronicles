@@ -34,9 +34,7 @@ export default function RootLayout({
       <body className="min-h-full bg-white font-sans text-ark-black">
         <Sidebar navLinks={navLinks} />
         <SplashScreenGate>
-          <div className="lg:pl-64">
-            {children}
-          </div>
+          {children}
         </SplashScreenGate>
       </body>
     </html>
