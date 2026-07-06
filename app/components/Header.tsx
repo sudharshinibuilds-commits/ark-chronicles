@@ -2,7 +2,8 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import type { CityLink, NavLink } from "./homepageData";
 
@@ -26,19 +27,24 @@ function ArkWordmark() {
   );
 }
 
-const menuItems = [
-  { icon: "🏠", label: "Home", href: "/" },
-  { icon: "📰", label: "Chronicles", href: "/chronicles" },
-  { icon: "👤", label: "Founders", href: "/founders" },
-  { icon: "📚", label: "Magazines", href: "/magazines" },
-  { icon: "🔬", label: "Research", href: "/research" },
-  { icon: "💼", label: "Investors", href: "/investors" },
-  { icon: "🌟", label: "Opportunities", href: "/opportunities" },
-  { icon: "🎓", label: "College Collabs", href: "/college-collabs" },
-  { icon: "ℹ️", label: "About Us", href: "/about" },
-  { icon: "🏆", label: "Rewards", href: "/rewards" },
-  { icon: "🔒", label: "Admin", href: "/admin" },
-];
+function MenuItemIcon() {
+  return (
+    <svg
+      className="mobile-menu-icon h-5 w-5 shrink-0"
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="10" cy="10" r="3.5" fill="currentColor" />
+      <path
+        d="M15.5 10H18M2 10H4.5M10 2V4.5M10 15.5V18"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 export default function Header({
   currentDate,
@@ -46,6 +52,19 @@ export default function Header({
   cityLinks,
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [menuOpen]);
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/5 bg-white/95 backdrop-blur-md">
@@ -127,72 +146,90 @@ export default function Header({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMenuOpen(false)}
-              className="fixed inset-0 bg-black/50 z-40"
+              className="mobile-menu-backdrop"
             />
             <motion.div
-              initial={{ x: -300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 h-full w-80 z-50 overflow-y-auto"
-              style={{ backgroundColor: "#1B2A6B" }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="mobile-menu overflow-y-auto"
             >
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div className="flex items-center justify-between border-b border-white/10 p-5">
                 <div>
-                  <div className="font-display text-lg font-black uppercase tracking-wider text-white">
-                    <span style={{ color: "#D4A017" }}>A.R.K</span>
+                  <div className="mobile-menu-title font-display text-lg font-black uppercase tracking-[0.28em]">
+                    ARK CHRONICLES
                   </div>
-                  <div className="text-[9px] font-black uppercase tracking-wider text-zinc-400" style={{ letterSpacing: "2px" }}>
-                    CHRONICLES
+                  <div
+                    className="mobile-menu-title mt-2 text-[10px] font-semibold uppercase tracking-[0.35em]"
+                  >
+                    Architects of Rising Knowledge
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-full p-2 text-white transition-all duration-150 hover:bg-white/10"
+                  className="mobile-menu-close rounded-full p-2 transition-all duration-150 hover:bg-white/10"
                   aria-label="Close navigation"
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 </button>
               </div>
 
-              <nav className="py-4">
-                {menuItems.map((item) => (
+              <nav className="flex flex-col px-5 py-6">
+                {navLinks.map((item) => {
+                  const isActive =
+                    item.label === "Home"
+                      ? pathname === "/"
+                      : pathname?.startsWith(item.href) && item.href !== "#";
+
+                  return (
                   <Link
-                    key={item.href}
+                    key={item.label}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-white transition-all duration-150 hover:bg-white/10"
+                    className={`mobile-menu-link flex items-center gap-3 rounded-2xl px-4 py-3.5 transition-all duration-150 hover:bg-white/10 ${
+                      isActive ? "mobile-menu-link-active" : ""
+                    }`}
                   >
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="text-sm font-medium">{item.label}</span>
+                    <MenuItemIcon />
+                    <span className="text-sm font-semibold uppercase tracking-[0.18em]">
+                      {item.label}
+                    </span>
                   </Link>
-                ))}
+                  );
+                })}
               </nav>
 
-              <div className="p-4 border-t border-white/10">
+              <div className="border-t border-white/10 p-5">
                 <div className="flex flex-col gap-3">
                   <Link
                     href="/submit-story"
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-full border border-white/20 px-4 py-3 text-center text-sm font-medium text-white transition-all duration-150 hover:border-white hover:bg-white/10"
+                    className="mobile-menu-action rounded-full border border-white/20 px-4 py-3 text-center text-sm font-semibold uppercase tracking-[0.16em] transition-all duration-150 hover:border-white hover:bg-white/10"
                   >
                     Submit Story
                   </Link>
                   <Link
                     href="#"
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-full border border-white/20 px-4 py-3 text-center text-sm font-medium text-white transition-all duration-150 hover:border-white hover:bg-white/10"
+                    className="mobile-menu-action rounded-full border border-white/20 px-4 py-3 text-center text-sm font-semibold uppercase tracking-[0.16em] transition-all duration-150 hover:border-white hover:bg-white/10"
                   >
                     Login
                   </Link>
                   <Link
                     href="#"
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-full px-4 py-3 text-center text-sm font-semibold text-white transition-all duration-150 hover:scale-105"
-                    style={{ backgroundColor: "#D4A017", color: "#1B2A6B", fontWeight: 700 }}
+                    className="mobile-menu-action rounded-full border border-white/20 px-4 py-3 text-center text-sm font-semibold uppercase tracking-[0.16em] transition-all duration-150 hover:bg-white/10"
                   >
                     Join Ark
                   </Link>

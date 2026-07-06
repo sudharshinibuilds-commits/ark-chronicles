@@ -64,6 +64,47 @@ select {
   animation: ticker-marquee 34s linear infinite;
 }
 
+.mobile-menu {
+  position: fixed !important;
+  z-index: 9999 !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #1b2a6b !important;
+}
+
+.mobile-menu-backdrop {
+  position: fixed !important;
+  z-index: 9998 !important;
+  inset: 0 !important;
+  background: rgba(10, 10, 10, 0.5) !important;
+}
+
+.mobile-menu-title,
+.mobile-menu-link,
+.mobile-menu-link span,
+.mobile-menu-icon,
+.mobile-menu-action,
+.mobile-menu-close {
+  color: #ffffff !important;
+}
+
+.mobile-menu-link:hover,
+.mobile-menu-link:hover span,
+.mobile-menu-link:hover .mobile-menu-icon,
+.mobile-menu-action:hover,
+.mobile-menu-close:hover {
+  color: #d4a017 !important;
+}
+
+.mobile-menu-link-active,
+.mobile-menu-link-active span,
+.mobile-menu-link-active .mobile-menu-icon {
+  color: #d4a017 !important;
+}
+
 @keyframes ticker-marquee {
   0% {
     transform: translateX(0);
