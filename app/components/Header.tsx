@@ -215,3 +215,72 @@ export default function Header({ currentDate, navLinks, cityLinks }: HeaderProps
               </button>
               <Link href="/" style={{ textDecoration: "none" }}>
                 <div className="leading-tight">
+                  <div style={{
+                    fontSize: "22px",
+                    fontWeight: 900,
+                    letterSpacing: "2px",
+                    textTransform: "uppercase",
+                  }}>
+                    <span style={{ color: "#D4A017" }}>A.R.K</span>
+                    <span style={{ color: "#0A0A0A", marginLeft: "10px" }}>CHRONICLES</span>
+                  </div>
+                  <div style={{
+                    fontSize: "9px",
+                    fontWeight: 700,
+                    letterSpacing: "2px",
+                    textTransform: "uppercase",
+                    color: "#888888",
+                    marginTop: "2px",
+                  }}>
+                    Architects of Rising Knowledge
+                  </div>
+                </div>
+              </Link>
+            </div>
+
+            {/* Right: buttons */}
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <Link href="/submit-story"
+                className="hidden sm:block"
+                style={{
+                  border: "1px solid #1B2A6B",
+                  borderRadius: "999px",
+                  padding: "8px 18px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: "#1B2A6B",
+                  textDecoration: "none",
+                }}>
+                Submit Story
+              </Link>
+              <Link href="#"
+                style={{
+                  border: "1px solid rgba(27,42,107,0.3)",
+                  borderRadius: "999px",
+                  padding: "8px 18px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: "#1B2A6B",
+                  textDecoration: "none",
+                }}>
+                Login
+              </Link>
+              <Link href="#"
+                style={{
+                  backgroundColor: "#1B2A6B",
+                  color: "#FFFFFF",
+                  borderRadius: "999px",
+                  padding: "8px 20px",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                }}>
+                Join Ark
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+    </>
+  );
+}

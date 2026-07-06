@@ -37,16 +37,18 @@ export default function MagazinesPage() {
       />
       <LiveTicker
         items={[
-          "Zyra Bio closes a $14M seed round to scale climate-first materials for advanced manufacturing.",
-          "Founders in Bengaluru launch a cross-border fintech rail for emerging market exporters.",
-          "ARK Research briefs investors on AI-native industrial software and deep-tech resilience.",
-          "Mumbai mobility startup reports 3x retention growth after rolling out community-led fleet financing.",
-          "Delhi health-tech collective opens applications for its women-led diagnostics accelerator cohort.",
+          "Zyra Bio closes a $14M seed round to scale climate-first materials.",
+          "Founders in Bengaluru launch a cross-border fintech rail.",
+          "ARK Research briefs investors on AI-native industrial software.",
+          "Mumbai mobility startup reports 3x retention growth.",
+          "Delhi health-tech collective opens applications for accelerator.",
         ]}
       />
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <h1 className="font-display text-5xl font-bold text-ark-black">Magazines</h1>
+        <h1 className="font-display text-5xl font-bold text-ark-black">
+          Magazines
+        </h1>
         <p className="mt-2 text-xl text-ark-navy">Curated Editions</p>
 
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -74,8 +76,13 @@ export default function MagazinesPage() {
                 <h3 className="font-display text-2xl font-bold text-ark-black leading-snug">
                   {item.title}
                 </h3>
-                <p className="mt-2 text-sm text-zinc-600">{item.month} {item.year}</p>
-                <p className="mt-3 text-sm text-zinc-500 leading-relaxed">{item.description}</p>
+                <p className="mt-2 text-sm text-zinc-600">
+                  {item.month} {item.year}
+                </p>
+                <p className="mt-3 text-sm text-zinc-500 leading-relaxed">
+                  {item.category} edition — curated stories for India's
+                  founder community.
+                </p>
                 <div className="mt-5 flex flex-col gap-2">
                   <button
                     type="button"
