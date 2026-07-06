@@ -30,12 +30,10 @@ export type MagazineCard = {
   id: string;
   category: string;
   title: string;
-  author: string;
   imageSeed: string;
   edition: string;
   month: string;
   year: string;
-  description: string;
 };
 
 export type HeroInsight = {
@@ -277,66 +275,54 @@ export const magazines: MagazineCard[] = [
     id: "mag-1",
     category: "Startup",
     title: "The Founder's Playbook",
-    author: "ARK Editorial Team",
-    imageSeed: "ark-mag-1",
+    imageSeed: "mag1",
     edition: "Edition 1",
     month: "January",
-    year: "2024",
-    description: "Essential strategies for first-time founders navigating India's startup ecosystem.",
+    year: "2026",
   },
   {
     id: "mag-2",
     category: "Tech",
     title: "AI Revolution",
-    author: "ARK Editorial Team",
-    imageSeed: "ark-mag-2",
+    imageSeed: "mag2",
     edition: "Edition 2",
     month: "February",
-    year: "2024",
-    description: "How artificial intelligence is transforming Indian industries and creating new opportunities.",
+    year: "2026",
   },
   {
     id: "mag-3",
     category: "Research",
     title: "Climate Tech Frontier",
-    author: "ARK Editorial Team",
-    imageSeed: "ark-mag-3",
+    imageSeed: "mag3",
     edition: "Edition 3",
     month: "March",
-    year: "2024",
-    description: "Deep dive into climate technology startups and their impact on sustainable development.",
+    year: "2026",
   },
   {
     id: "mag-4",
     category: "Tech",
     title: "Fintech Disruption",
-    author: "ARK Editorial Team",
-    imageSeed: "ark-mag-4",
+    imageSeed: "mag4",
     edition: "Edition 4",
     month: "April",
-    year: "2024",
-    description: "The future of financial technology in India's rapidly evolving digital landscape.",
+    year: "2026",
   },
   {
     id: "mag-5",
     category: "Startup",
     title: "HealthTech Innovation",
-    author: "ARK Editorial Team",
-    imageSeed: "ark-mag-5",
+    imageSeed: "mag5",
     edition: "Edition 5",
     month: "May",
-    year: "2024",
-    description: "Revolutionary healthcare technologies changing patient care across India.",
+    year: "2026",
   },
   {
     id: "mag-6",
-    category: "Special Edition",
-    title: "Special Edition: Women in Tech",
-    author: "ARK Editorial Team",
-    imageSeed: "ark-mag-6",
-    edition: "Special",
+    category: "Research",
+    title: "Women in Tech",
+    imageSeed: "mag6",
+    edition: "Edition 6",
     month: "June",
-    year: "2024",
-    description: "Celebrating women leaders who are shaping India's technology landscape.",
+    year: "2026",
   },
 ];

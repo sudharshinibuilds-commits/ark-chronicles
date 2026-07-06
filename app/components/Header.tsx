@@ -27,24 +27,20 @@ function ArkWordmark() {
   );
 }
 
-function MenuItemIcon() {
-  return (
-    <svg
-      className="mobile-menu-icon h-5 w-5 shrink-0"
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-    >
-      <circle cx="10" cy="10" r="3.5" fill="currentColor" />
-      <path
-        d="M15.5 10H18M2 10H4.5M10 2V4.5M10 15.5V18"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
+const drawerLinks = [
+  { icon: "🏠", label: "Home", href: "/" },
+  { icon: "📰", label: "Chronicles", href: "/chronicles" },
+  { icon: "👤", label: "Founders", href: "/founders" },
+  { icon: "📚", label: "Magazines", href: "/magazines" },
+  { icon: "🔬", label: "Research", href: "/research" },
+  { icon: "💼", label: "Investors", href: "/investors" },
+  { icon: "🌟", label: "Opportunities", href: "/opportunities" },
+  { icon: "🎓", label: "College Collabs", href: "/college-collabs" },
+  { icon: "📝", label: "Submit Story", href: "/submit-story" },
+  { icon: "ℹ️", label: "About Us", href: "/about" },
+  { icon: "🏆", label: "Rewards", href: "/rewards" },
+  { icon: "🔒", label: "Admin", href: "/admin" },
+];
 
 export default function Header({
   currentDate,
@@ -146,22 +142,22 @@ export default function Header({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMenuOpen(false)}
-              className="mobile-menu-backdrop"
+              className="menu-overlay"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="mobile-menu overflow-y-auto"
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="menu-drawer open overflow-y-auto"
             >
               <div className="flex items-center justify-between border-b border-white/10 p-5">
                 <div>
-                  <div className="mobile-menu-title font-display text-lg font-black uppercase tracking-[0.28em]">
+                  <div className="menu-drawer-title font-display text-lg font-black uppercase tracking-[0.18em]">
                     ARK CHRONICLES
                   </div>
                   <div
-                    className="mobile-menu-title mt-2 text-[10px] font-semibold uppercase tracking-[0.35em]"
+                    className="menu-drawer-title mt-2 text-[10px] font-semibold uppercase tracking-[0.22em]"
                   >
                     Architects of Rising Knowledge
                   </div>
@@ -169,7 +165,7 @@ export default function Header({
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
-                  className="mobile-menu-close rounded-full p-2 transition-all duration-150 hover:bg-white/10"
+                  className="menu-drawer-close rounded-full p-2 transition-all duration-150 hover:bg-white/10"
                   aria-label="Close navigation"
                 >
                   <svg
@@ -185,56 +181,30 @@ export default function Header({
                 </button>
               </div>
 
-              <nav className="flex flex-col px-5 py-6">
-                {navLinks.map((item) => {
+              <nav className="flex flex-col py-4">
+                {drawerLinks.map((item) => {
                   const isActive =
-                    item.label === "Home"
-                      ? pathname === "/"
-                      : pathname?.startsWith(item.href) && item.href !== "#";
+                    item.href === "/" ? pathname === "/" : pathname === item.href;
 
                   return (
                   <Link
                     key={item.label}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className={`mobile-menu-link flex items-center gap-3 rounded-2xl px-4 py-3.5 transition-all duration-150 hover:bg-white/10 ${
-                      isActive ? "mobile-menu-link-active" : ""
+                    className={`menu-drawer-link flex items-center gap-3 px-4 py-4 transition-all duration-150 hover:bg-white/10 ${
+                      isActive ? "menu-drawer-link-active" : ""
                     }`}
                   >
-                    <MenuItemIcon />
-                    <span className="text-sm font-semibold uppercase tracking-[0.18em]">
+                    <span className="menu-drawer-emoji text-xl leading-none">
+                      {item.icon}
+                    </span>
+                    <span className="text-base font-semibold">
                       {item.label}
                     </span>
                   </Link>
                   );
                 })}
               </nav>
-
-              <div className="border-t border-white/10 p-5">
-                <div className="flex flex-col gap-3">
-                  <Link
-                    href="/submit-story"
-                    onClick={() => setMenuOpen(false)}
-                    className="mobile-menu-action rounded-full border border-white/20 px-4 py-3 text-center text-sm font-semibold uppercase tracking-[0.16em] transition-all duration-150 hover:border-white hover:bg-white/10"
-                  >
-                    Submit Story
-                  </Link>
-                  <Link
-                    href="#"
-                    onClick={() => setMenuOpen(false)}
-                    className="mobile-menu-action rounded-full border border-white/20 px-4 py-3 text-center text-sm font-semibold uppercase tracking-[0.16em] transition-all duration-150 hover:border-white hover:bg-white/10"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="#"
-                    onClick={() => setMenuOpen(false)}
-                    className="mobile-menu-action rounded-full border border-white/20 px-4 py-3 text-center text-sm font-semibold uppercase tracking-[0.16em] transition-all duration-150 hover:bg-white/10"
-                  >
-                    Join Ark
-                  </Link>
-                </div>
-              </div>
             </motion.div>
           </>
         ) : null}

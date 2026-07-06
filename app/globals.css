@@ -64,44 +64,53 @@ select {
   animation: ticker-marquee 34s linear infinite;
 }
 
-.mobile-menu {
+.menu-drawer {
   position: fixed !important;
   z-index: 9999 !important;
-  inset: 0 !important;
   top: 0 !important;
   left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
+  width: 280px !important;
+  height: 100vh !important;
   background: #1b2a6b !important;
+  transform: translateX(-280px);
+  transition: transform 0.3s ease;
 }
 
-.mobile-menu-backdrop {
+.menu-drawer.open {
+  transform: translateX(0);
+}
+
+.mobile-menu-backdrop,
+.menu-overlay {
   position: fixed !important;
   z-index: 9998 !important;
   inset: 0 !important;
-  background: rgba(10, 10, 10, 0.5) !important;
+  background: rgba(0, 0, 0, 0.5) !important;
 }
 
-.mobile-menu-title,
-.mobile-menu-link,
-.mobile-menu-link span,
-.mobile-menu-icon,
-.mobile-menu-action,
-.mobile-menu-close {
+.menu-drawer-title,
+.menu-drawer-link,
+.menu-drawer-link span,
+.menu-drawer-emoji,
+.menu-drawer-close {
   color: #ffffff !important;
 }
 
-.mobile-menu-link:hover,
-.mobile-menu-link:hover span,
-.mobile-menu-link:hover .mobile-menu-icon,
-.mobile-menu-action:hover,
-.mobile-menu-close:hover {
+.menu-drawer-link {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+.menu-drawer-link:hover,
+.menu-drawer-link:hover span,
+.menu-drawer-link:hover .menu-drawer-emoji,
+.menu-drawer-close:hover {
   color: #d4a017 !important;
 }
 
-.mobile-menu-link-active,
-.mobile-menu-link-active span,
-.mobile-menu-link-active .mobile-menu-icon {
+.menu-drawer-link-active,
+.menu-drawer-link-active span,
+.menu-drawer-link-active .menu-drawer-emoji {
   color: #d4a017 !important;
 }
 

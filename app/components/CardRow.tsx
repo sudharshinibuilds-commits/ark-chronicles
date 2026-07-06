@@ -287,9 +287,9 @@ export default function CardRow(props: CardRowProps) {
                     delay: index * 0.04,
                   }}
                   whileHover={{ y: -6, scale: 1.03 }}
-                  className="relative h-[400px] w-[200px] shrink-0 snap-start overflow-hidden rounded-[1.6rem] bg-white shadow-[0_20px_55px_rgba(10,10,10,0.12)] sm:w-[240px]"
+                  className="relative flex h-[470px] w-[210px] shrink-0 snap-start flex-col overflow-hidden rounded-[1.6rem] border border-black/8 bg-white shadow-[0_20px_55px_rgba(10,10,10,0.12)] sm:w-[240px]"
                 >
-                  <div className="relative h-[280px] w-full overflow-hidden">
+                  <div className="relative h-[290px] w-full overflow-hidden">
                     <Image
                       src={`https://picsum.photos/seed/${item.imageSeed}/300/400`}
                       alt={item.title}
@@ -298,29 +298,30 @@ export default function CardRow(props: CardRowProps) {
                       sizes="(max-width: 640px) 80vw, 240px"
                     />
                     <div className="absolute top-3 left-3">
-                      <span className="inline-flex rounded-full bg-ark-gold px-2 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-ark-navy">
+                      <span className="inline-flex rounded-r-full bg-ark-gold px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-ark-navy">
                         {item.edition}
                       </span>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <div className="mb-2 inline-flex rounded-full bg-ark-navy px-2 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white">
+                  <div className="flex flex-1 flex-col p-4">
+                    <div className="mb-3 inline-flex w-fit rounded-full bg-ark-navy px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white">
                       {item.category}
                     </div>
-                    <h3 className="font-display text-lg font-bold text-ark-black leading-snug">
+                    <h3 className="font-display text-xl font-bold leading-snug text-ark-black">
                       {item.title}
                     </h3>
-                    <p className="mt-2 text-xs text-zinc-600">{item.month} {item.year}</p>
-                    <p className="mt-2 text-xs text-zinc-500 line-clamp-2">{item.description}</p>
+                    <p className="mt-2 text-sm font-medium text-zinc-600">
+                      {item.month} {item.year}
+                    </p>
                     <button
                       type="button"
-                      className="mt-3 w-full rounded-full bg-ark-gold px-3 py-2 text-xs font-semibold text-ark-navy transition-all duration-150 hover:scale-105"
+                      className="mt-auto w-full rounded-full bg-ark-gold px-3 py-2.5 text-sm font-semibold text-ark-navy transition-all duration-150 hover:scale-105 hover:bg-[#e1b54b]"
                     >
                       Read Now
                     </button>
                     <button
                       type="button"
-                      className="mt-2 w-full rounded-full border border-ark-navy/20 px-3 py-2 text-xs font-semibold text-ark-navy transition-all duration-150 hover:scale-105 hover:border-ark-navy"
+                      className="mt-2 w-full rounded-full border border-ark-navy px-3 py-2.5 text-sm font-semibold text-ark-navy transition-all duration-150 hover:scale-105 hover:bg-ark-navy/5"
                     >
                       Download PDF
                     </button>
