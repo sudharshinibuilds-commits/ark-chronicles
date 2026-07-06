@@ -1,10 +1,9 @@
 "use client";
-
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import { createPortal } from "react-dom";
 import type { CityLink, NavLink } from "./homepageData";
 
 type HeaderProps = {
@@ -16,11 +15,11 @@ type HeaderProps = {
 function ArkWordmark() {
   return (
     <div className="leading-tight">
-      <div className="font-display text-xl font-black uppercase tracking-[0.22em] sm:text-2xl" style={{ fontWeight: 900 }}>
-        <span className="text-ark-gold" style={{ color: "#D4A017" }}>A.R.K</span>
-        <span className="ml-3 text-ark-black">CHRONICLES</span>
+      <div className="font-display text-xl font-black uppercase tracking-[0.22em] sm:text-2xl">
+        <span style={{ color: "#D4A017" }}>A.R.K</span>
+        <span className="ml-3" style={{ color: "#0A0A0A" }}>CHRONICLES</span>
       </div>
-      <div className="mt-1 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 sm:text-[9px]" style={{ fontWeight: 900, letterSpacing: "2px" }}>
+      <div className="mt-1 text-[9px] font-black uppercase" style={{ letterSpacing: "2px", color: "#888888" }}>
         Architects of Rising Knowledge
       </div>
     </div>
@@ -42,173 +41,273 @@ const drawerLinks = [
   { icon: "🔒", label: "Admin", href: "/admin" },
 ];
 
-export default function Header({
-  currentDate,
-  navLinks,
-  cityLinks,
-}: HeaderProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
+function MenuDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
+    setMounted(true);
+  }, []);
 
-    if (menuOpen) {
+  useEffect(() => {
+    if (open) {
       document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
     }
-
     return () => {
-      document.body.style.overflow = originalOverflow;
+      document.body.style.overflow = "";
     };
-  }, [menuOpen]);
+  }, [open]);
 
-  return (
-    <header className="sticky top-0 z-50 border-b border-black/5 bg-white/95 backdrop-blur-md">
-      <div className="bg-ark-black text-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 text-[11px] sm:px-6 lg:px-8">
-          <div className="hidden sm:block">{currentDate}</div>
-          <div className="mx-auto text-center font-semibold uppercase tracking-[0.35em] text-ark-gold">
-            Architects of Rising Knowledge
-          </div>
-          <div className="hidden items-center gap-4 text-zinc-300 md:flex">
-            {cityLinks.map((city) => (
-              <Link
-                key={city.label}
-                href={city.href}
-                className="transition-colors duration-150 hover:text-ark-gold"
-              >
-                {city.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
+  if (!mounted) return null;
 
-      <div className="border-b border-black/8 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={() => setMenuOpen((open) => !open)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 text-ark-black transition-all duration-150 hover:scale-105 hover:border-ark-navy hover:text-ark-navy"
-              aria-expanded={menuOpen}
-              aria-label="Toggle navigation menu"
-            >
-              <div className="flex flex-col gap-1.5">
-                <span className="h-0.5 w-5 bg-current" />
-                <span className="h-0.5 w-5 bg-current" />
-                <span className="h-0.5 w-5 bg-current" />
-              </div>
-            </button>
-            <Link
-              href="/"
-              className="transition-transform duration-150 hover:scale-[1.02]"
-            >
-              <ArkWordmark />
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/submit-story"
-              className="hidden sm:block rounded-full border border-ark-navy/20 px-4 py-2 text-sm font-medium text-ark-navy transition-all duration-150 hover:scale-105 hover:border-ark-navy hover:bg-ark-navy/5"
-            >
-              Submit Story
-            </Link>
-            <Link
-              href="#"
-              className="rounded-full border border-ark-navy/20 px-4 py-2 text-sm font-medium text-ark-navy transition-all duration-150 hover:scale-105 hover:border-ark-navy hover:bg-ark-navy/5"
-            >
-              Login
-            </Link>
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-              <Link
-                href="#"
-                className="rounded-full px-5 py-2.5 text-sm font-semibold shadow-lg transition-all duration-150 hover:scale-105"
-                style={{ backgroundColor: "#1B2A6B", color: "#FFFFFF", fontWeight: 700 }}
-              >
-                Join Ark
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {menuOpen ? (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMenuOpen(false)}
-              className="menu-overlay"
-            />
-            <motion.div
-              initial={{ x: -280 }}
-              animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="menu-drawer open overflow-y-auto"
-            >
-              <div className="flex items-center justify-between border-b border-white/10 p-5">
-                <div>
-                  <div className="menu-drawer-title font-display text-lg font-black uppercase tracking-[0.18em]">
-                    ARK CHRONICLES
-                  </div>
-                  <div
-                    className="menu-drawer-title mt-2 text-[10px] font-semibold uppercase tracking-[0.22em]"
-                  >
-                    Architects of Rising Knowledge
-                  </div>
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Dark overlay behind drawer */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            style={{
+              position: "fixed",
+              inset: 0,
+              backgroundColor: "rgba(0,0,0,0.6)",
+              zIndex: 99998,
+            }}
+          />
+          {/* Drawer itself */}
+          <motion.div
+            initial={{ x: -300 }}
+            animate={{ x: 0 }}
+            exit={{ x: -300 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "280px",
+              height: "100vh",
+              backgroundColor: "#1B2A6B",
+              zIndex: 99999,
+              overflowY: "auto",
+              boxShadow: "4px 0 24px rgba(0,0,0,0.3)",
+            }}
+          >
+            {/* Drawer header */}
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "20px",
+              borderBottom: "1px solid rgba(255,255,255,0.15)",
+            }}>
+              <div>
+                <div style={{
+                  color: "#D4A017",
+                  fontWeight: 900,
+                  fontSize: "18px",
+                  letterSpacing: "2px",
+                  textTransform: "uppercase",
+                }}>
+                  ARK CHRONICLES
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setMenuOpen(false)}
-                  className="menu-drawer-close rounded-full p-2 transition-all duration-150 hover:bg-white/10"
-                  aria-label="Close navigation"
-                >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
-                </button>
+                <div style={{
+                  color: "#FFFFFF",
+                  fontSize: "10px",
+                  letterSpacing: "2px",
+                  textTransform: "uppercase",
+                  marginTop: "4px",
+                  opacity: 0.7,
+                }}>
+                  Architects of Rising Knowledge
+                </div>
               </div>
+              <button
+                onClick={onClose}
+                style={{
+                  color: "#FFFFFF",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "36px",
+                  height: "36px",
+                  cursor: "pointer",
+                  fontSize: "18px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                ✕
+              </button>
+            </div>
 
-              <nav className="flex flex-col py-4">
-                {drawerLinks.map((item) => {
-                  const isActive =
-                    item.href === "/" ? pathname === "/" : pathname === item.href;
-
-                  return (
+            {/* Nav links */}
+            <nav style={{ padding: "12px 0" }}>
+              {drawerLinks.map((item) => {
+                const isActive = item.href === "/" 
+                  ? pathname === "/" 
+                  : pathname === item.href;
+                return (
                   <Link
                     key={item.label}
                     href={item.href}
-                    onClick={() => setMenuOpen(false)}
-                    className={`menu-drawer-link flex items-center gap-3 px-4 py-4 transition-all duration-150 hover:bg-white/10 ${
-                      isActive ? "menu-drawer-link-active" : ""
-                    }`}
+                    onClick={onClose}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "14px",
+                      padding: "14px 20px",
+                      color: isActive ? "#D4A017" : "#FFFFFF",
+                      textDecoration: "none",
+                      fontSize: "15px",
+                      fontWeight: 600,
+                      backgroundColor: isActive 
+                        ? "rgba(212,160,23,0.15)" 
+                        : "transparent",
+                      borderLeft: isActive 
+                        ? "3px solid #D4A017" 
+                        : "3px solid transparent",
+                      transition: "all 0.15s ease",
+                    }}
+                    onMouseOver={(e) => {
+                      const el = e.currentTarget;
+                      el.style.backgroundColor = "rgba(255,255,255,0.1)";
+                      el.style.color = "#D4A017";
+                    }}
+                    onMouseOut={(e) => {
+                      const el = e.currentTarget;
+                      el.style.backgroundColor = isActive 
+                        ? "rgba(212,160,23,0.15)" 
+                        : "transparent";
+                      el.style.color = isActive ? "#D4A017" : "#FFFFFF";
+                    }}
                   >
-                    <span className="menu-drawer-emoji text-xl leading-none">
-                      {item.icon}
-                    </span>
-                    <span className="text-base font-semibold">
-                      {item.label}
-                    </span>
+                    <span style={{ fontSize: "20px" }}>{item.icon}</span>
+                    <span>{item.label}</span>
                   </Link>
-                  );
-                })}
-              </nav>
-            </motion.div>
-          </>
-        ) : null}
-      </AnimatePresence>
-    </header>
+                );
+              })}
+            </nav>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
+}
+
+export default function Header({ currentDate, navLinks, cityLinks }: HeaderProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <>
+      <header className="sticky top-0 bg-white border-b border-black/10" style={{ zIndex: 1000 }}>
+        {/* Top black bar */}
+        <div style={{ backgroundColor: "#0A0A0A", color: "#fff" }}>
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 text-xs sm:px-6 lg:px-8">
+            <div className="hidden sm:block">{currentDate}</div>
+            <div style={{ color: "#D4A017", fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase", fontSize: "11px" }}>
+              Architects of Rising Knowledge
+            </div>
+            <div className="hidden items-center gap-4 md:flex">
+              {cityLinks.map((city) => (
+                <Link key={city.label} href={city.href} style={{ color: "#ccc", fontSize: "11px", textDecoration: "none" }}>
+                  {city.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Main navbar */}
+        <div style={{ backgroundColor: "#FFFFFF", borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+            {/* Left: hamburger + logo */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setMenuOpen(true)}
+                style={{
+                  background: "none",
+                  border: "1px solid rgba(0,0,0,0.15)",
+                  borderRadius: "50%",
+                  width: "44px",
+                  height: "44px",
+                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "5px",
+                  color: "#0A0A0A",
+                }}
+              >
+                <span style={{ width: "20px", height: "2px", backgroundColor: "currentColor", display: "block" }} />
+                <span style={{ width: "20px", height: "2px", backgroundColor: "currentColor", display: "block" }} />
+                <span style={{ width: "20px", height: "2px", backgroundColor: "currentColor", display: "block" }} />
+              </button>
+              <Link href="/" style={{ textDecoration: "none" }}>
+                <ArkWordmark />
+              </Link>
+            </div>
+
+            {/* Right: buttons only */}
+            <div className="flex items-center gap-3">
+              <Link
+                href="/submit-story"
+                className="hidden sm:block"
+                style={{
+                  border: "1px solid #1B2A6B",
+                  borderRadius: "999px",
+                  padding: "8px 18px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: "#1B2A6B",
+                  textDecoration: "none",
+                }}
+              >
+                Submit Story
+              </Link>
+              <Link
+                href="#"
+                style={{
+                  border: "1px solid rgba(27,42,107,0.3)",
+                  borderRadius: "999px",
+                  padding: "8px 18px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: "#1B2A6B",
+                  textDecoration: "none",
+                }}
+              >
+                Login
+              </Link>
+              <Link
+                href="#"
+                style={{
+                  backgroundColor: "#1B2A6B",
+                  color: "#FFFFFF",
+                  borderRadius: "999px",
+                  padding: "8px 20px",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                  border: "none",
+                }}
+              >
+                Join Ark
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Menu drawer rendered at body level - always on top */}
+      <MenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+    </>
   );
 }
