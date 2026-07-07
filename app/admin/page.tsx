@@ -1,199 +1,202 @@
 "use client";
-
-import AudioPlayer from "../components/AudioPlayer";
-import Footer from "../components/Footer";
-import Header from "../components/Header";
-import LiveTicker from "../components/LiveTicker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+import Link from "next/link";
 
 export default function AdminPage() {
-  const currentDate = new Intl.DateTimeFormat("en-IN", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date());
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    articles: 0, users: 0, pending: 0, founders: 0
+  });
+  const [newArticle, setNewArticle] = useState({
+    title: "", author: "", category: "Startups",
+    content: "", image_url: ""
+  });
+  const [publishSuccess, setPublishSuccess] = useState(false);
 
-  const [authenticated, setAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
-  const [activeTab, setActiveTab] = useState<"pending" | "users" | "colleges" | "investors">("pending");
+  useEffect(() => {
+    checkAdmin();
+  }, []);
 
-  const pendingStories = [
-    { id: "1", title: "How AI is transforming Indian agriculture", author: "Rahul Sharma", date: "Dec 10, 2024" },
-    { id: "2", title: "The rise of femtech in India's startup ecosystem", author: "Priya Patel", date: "Dec 9, 2024" },
-    { id: "3", title: "Building sustainable supply chains for D2C brands", author: "Amit Kumar", date: "Dec 8, 2024" },
-  ];
+  const checkAdmin = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { window.location.href = "/login"; return; }
+    const { data: profile } = await supabase
+      .from("profiles").select("role").eq("id", user.id).single();
+    if (!profile || profile.role !== "admin") {
+      window.location.href = "/";
+      return;
+    }
+    setIsAdmin(true);
+    loadData();
+  };
 
-  if (!authenticated) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-[#faf9f6] px-4">
-        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-black/8 bg-white p-8 shadow-lg">
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">A.R.K</div>
-            <div className="font-display text-2xl font-bold text-ark-black">Admin Portal</div>
-          </div>
-          <form
-            className="mt-6 space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (password === "admin123") {
-                setAuthenticated(true);
-              } else {
-                alert("Invalid password");
-              }
-            }}
-          >
-            <div>
-              <label className="block text-sm font-semibold text-ark-black">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full rounded-full border border-black/10 px-4 py-3 text-sm outline-none focus:border-ark-navy"
-                placeholder="Enter admin password"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full rounded-full bg-ark-navy px-6 py-3 text-sm font-semibold text-white transition-all duration-150 hover:scale-[1.02] hover:bg-[#22378c]"
-            >
-              Login
-            </button>
-          </form>
-        </div>
-      </main>
-    );
-  }
+  const loadData = async () => {
+    const [articles, users, subs, founders] = await Promise.all([
+      supabase.from("articles").select("id", { count: "exact" }),
+      supabase.from("profiles").select("id", { count: "exact" }),
+      supabase.from("submissions").select("*").eq("status", "pending"),
+      supabase.from("founders").select("id", { count: "exact" }),
+    ]);
+    setStats({
+      articles: articles.count || 0,
+      users: users.count || 0,
+      pending: subs.data?.length || 0,
+      founders: founders.count || 0,
+    });
+    setSubmissions(subs.data || []);
+    setLoading(false);
+  };
+
+  const handleSubmission = async (id: string, status: string) => {
+    await supabase.from("submissions").update({ status }).eq("id", id);
+    setSubmissions(submissions.filter(s => s.id !== id));
+  };
+
+  const publishArticle = async () => {
+    await supabase.from("articles").insert({
+      ...newArticle,
+      published: true,
+      created_at: new Date().toISOString(),
+    });
+    setPublishSuccess(true);
+    setNewArticle({ title: "", author: "", category: "Startups", content: "", image_url: "" });
+    setTimeout(() => setPublishSuccess(false), 3000);
+  };
+
+  if (loading) return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ fontSize: "18px", color: "#1B2A6B", fontWeight: 700 }}>Loading Admin Dashboard...</div>
+    </div>
+  );
 
   return (
-    <main className="min-h-screen bg-[#faf9f6]">
-      <Header
-        currentDate={currentDate}
-        navLinks={[
-          { label: "Home", href: "/" },
-          { label: "Chronicles", href: "/chronicles" },
-          { label: "Founders", href: "/founders" },
-          { label: "Research", href: "/research" },
-          { label: "Investors", href: "/investors" },
-          { label: "Opportunities", href: "/opportunities" },
-          { label: "Submit Story", href: "/submit-story" },
-          { label: "About Us", href: "/about" },
-        ]}
-        cityLinks={[
-          { label: "Bengaluru", href: "#" },
-          { label: "Mumbai", href: "#" },
-          { label: "Delhi", href: "#" },
-          { label: "Hyderabad", href: "#" },
-        ]}
-      />
-      <LiveTicker
-        items={[
-          "Zyra Bio closes a $14M seed round to scale climate-first materials for advanced manufacturing.",
-          "Founders in Bengaluru launch a cross-border fintech rail for emerging market exporters.",
-          "ARK Research briefs investors on AI-native industrial software and deep-tech resilience.",
-          "Mumbai mobility startup reports 3x retention growth after rolling out community-led fleet financing.",
-          "Delhi health-tech collective opens applications for its women-led diagnostics accelerator cohort.",
-        ]}
-      />
+    <div style={{ minHeight: "100vh", background: "#faf9f6", padding: "24px" }}>
+      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <h1 className="font-display text-5xl font-bold text-ark-black">Admin Dashboard</h1>
-
-        <div className="mt-8 grid grid-cols-2 gap-4 rounded-2xl border border-ark-navy/20 bg-ark-navy/5 p-6 sm:grid-cols-4">
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">5,234</div>
-            <div className="mt-1 text-sm text-zinc-600">Total Users</div>
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" }}>
+          <div>
+            <div style={{ fontSize: "28px", fontWeight: 900 }}>
+              <span style={{ color: "#D4A017" }}>ARK</span>
+              <span style={{ color: "#0A0A0A" }}> Admin Dashboard</span>
+            </div>
+            <div style={{ fontSize: "13px", color: "#888", marginTop: "4px" }}>Architects of Rising Knowledge</div>
           </div>
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">1,200</div>
-            <div className="mt-1 text-sm text-zinc-600">Articles</div>
-          </div>
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">3</div>
-            <div className="mt-1 text-sm text-zinc-600">Pending Stories</div>
-          </div>
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">156</div>
-            <div className="mt-1 text-sm text-zinc-600">Active Streaks</div>
-          </div>
+          <Link href="/" style={{
+            background: "#1B2A6B", color: "#fff",
+            padding: "10px 20px", borderRadius: "999px",
+            fontWeight: 700, fontSize: "13px", textDecoration: "none",
+          }}>
+            ← Back to Site
+          </Link>
         </div>
 
-        <div className="mt-8">
-          <div className="flex gap-2 border-b border-black/10">
+        {/* Stats */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", marginBottom: "32px" }}>
+          {[
+            { label: "Total Articles", value: stats.articles, icon: "📰" },
+            { label: "Total Users", value: stats.users, icon: "👤" },
+            { label: "Pending Review", value: stats.pending, icon: "⏳" },
+            { label: "Total Founders", value: stats.founders, icon: "🚀" },
+          ].map(s => (
+            <div key={s.label} style={{
+              background: "#fff", borderRadius: "12px", padding: "24px",
+              borderTop: "4px solid #1B2A6B", boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              textAlign: "center",
+            }}>
+              <div style={{ fontSize: "32px", marginBottom: "8px" }}>{s.icon}</div>
+              <div style={{ fontSize: "32px", fontWeight: 900, color: "#1B2A6B" }}>{s.value}</div>
+              <div style={{ fontSize: "12px", color: "#888", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px" }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Publish Article */}
+        <div style={{ background: "#fff", borderRadius: "12px", padding: "32px", marginBottom: "32px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+          <h2 style={{ fontSize: "20px", fontWeight: 800, marginBottom: "20px", borderLeft: "4px solid #D4A017", paddingLeft: "12px" }}>
+            📝 Publish New Article
+          </h2>
+          {publishSuccess && (
+            <div style={{ background: "#f0fff4", border: "1px solid #68d391", color: "#276749", padding: "12px", borderRadius: "8px", marginBottom: "16px", fontWeight: 700 }}>
+              ✅ Article published successfully! It's now live on the homepage!
+            </div>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
             {[
-              { id: "pending", label: "Pending Stories" },
-              { id: "users", label: "Users" },
-              { id: "colleges", label: "Colleges" },
-              { id: "investors", label: "Investors" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`px-4 py-3 text-sm font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? "border-b-2 border-ark-navy text-ark-navy"
-                    : "text-zinc-600 hover:text-ark-black"
-                }`}
-              >
-                {tab.label}
-              </button>
+              ["Article Title", "title", "text"],
+              ["Author Name", "author", "text"],
+              ["Image URL", "image_url", "text"],
+            ].map(([label, key, type]) => (
+              <div key={key}>
+                <label style={{ fontSize: "12px", fontWeight: 700, color: "#555", display: "block", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "1px" }}>{label}</label>
+                <input
+                  type={type}
+                  value={newArticle[key as keyof typeof newArticle]}
+                  onChange={(e) => setNewArticle({ ...newArticle, [key]: e.target.value })}
+                  style={{ width: "100%", padding: "10px 14px", border: "2px solid #e5e5e5", borderRadius: "8px", fontSize: "14px", boxSizing: "border-box" }}
+                />
+              </div>
             ))}
+            <div>
+              <label style={{ fontSize: "12px", fontWeight: 700, color: "#555", display: "block", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "1px" }}>Category</label>
+              <select
+                value={newArticle.category}
+                onChange={(e) => setNewArticle({ ...newArticle, category: e.target.value })}
+                style={{ width: "100%", padding: "10px 14px", border: "2px solid #e5e5e5", borderRadius: "8px", fontSize: "14px", boxSizing: "border-box" }}
+              >
+                {["Startups","Tech","Research","Opportunities","Hackathons","Opinion"].map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
           </div>
-
-          <div className="mt-6 overflow-hidden rounded-2xl border border-black/8 bg-white shadow-lg">
-            {activeTab === "pending" && (
-              <div className="divide-y divide-black/5">
-                {pendingStories.map((story) => (
-                  <div key={story.id} className="flex items-center justify-between p-6">
-                    <div>
-                      <h3 className="font-display text-lg font-bold text-ark-black">{story.title}</h3>
-                      <p className="mt-1 text-sm text-zinc-600">
-                        By {story.author} • {story.date}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        className="rounded-full bg-green-500 px-4 py-2 text-sm font-semibold text-white transition-all duration-150 hover:scale-105 hover:bg-green-600"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition-all duration-150 hover:scale-105 hover:bg-red-600"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {activeTab === "users" && (
-              <div className="p-6 text-center text-zinc-600">
-                <p>User management module coming soon...</p>
-              </div>
-            )}
-
-            {activeTab === "colleges" && (
-              <div className="p-6 text-center text-zinc-600">
-                <p>College management module coming soon...</p>
-              </div>
-            )}
-
-            {activeTab === "investors" && (
-              <div className="p-6 text-center text-zinc-600">
-                <p>Investor management module coming soon...</p>
-              </div>
-            )}
+          <div style={{ marginTop: "16px" }}>
+            <label style={{ fontSize: "12px", fontWeight: 700, color: "#555", display: "block", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "1px" }}>Content</label>
+            <textarea
+              value={newArticle.content}
+              onChange={(e) => setNewArticle({ ...newArticle, content: e.target.value })}
+              placeholder="Write your article content here..."
+              style={{ width: "100%", padding: "10px 14px", border: "2px solid #e5e5e5", borderRadius: "8px", fontSize: "14px", height: "150px", boxSizing: "border-box", resize: "vertical" }}
+            />
           </div>
+          <button
+            onClick={publishArticle}
+            style={{ marginTop: "16px", background: "#1B2A6B", color: "#fff", border: "none", borderRadius: "999px", padding: "14px 32px", fontWeight: 700, fontSize: "14px", cursor: "pointer" }}
+          >
+            🚀 Publish Article Live
+          </button>
+        </div>
+
+        {/* Pending Submissions */}
+        <div style={{ background: "#fff", borderRadius: "12px", padding: "32px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+          <h2 style={{ fontSize: "20px", fontWeight: 800, marginBottom: "20px", borderLeft: "4px solid #1B2A6B", paddingLeft: "12px" }}>
+            ⏳ Pending Submissions ({submissions.length})
+          </h2>
+          {submissions.length === 0 ? (
+            <div style={{ textAlign: "center", color: "#888", padding: "32px", fontSize: "16px" }}>
+              🎉 No pending submissions right now!
+            </div>
+          ) : (
+            submissions.map(s => (
+              <div key={s.id} style={{ borderBottom: "1px solid #e5e5e5", paddingBottom: "16px", marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: "15px" }}>{s.title}</div>
+                  <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>By {s.submitted_by} · {s.email}</div>
+                </div>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button onClick={() => handleSubmission(s.id, "approved")} style={{ background: "#27ae60", color: "#fff", border: "none", padding: "8px 18px", borderRadius: "999px", fontWeight: 700, fontSize: "12px", cursor: "pointer" }}>
+                    ✅ Approve
+                  </button>
+                  <button onClick={() => handleSubmission(s.id, "rejected")} style={{ background: "#e74c3c", color: "#fff", border: "none", padding: "8px 18px", borderRadius: "999px", fontWeight: 700, fontSize: "12px", cursor: "pointer" }}>
+                    ❌ Reject
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
-
-      <Footer />
-      <AudioPlayer />
-    </main>
+    </div>
   );
 }
