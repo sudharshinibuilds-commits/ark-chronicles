@@ -34,6 +34,10 @@ export default function RootLayout({
       <body className="min-h-full bg-white font-sans text-ark-black">
         <Sidebar navLinks={navLinks} />
         <SplashScreenGate>
+import AuthModal from "./components/AuthModal";
+
+// Inside the body tag, before {children}:
+<AuthModal />
           {children}
         </SplashScreenGate>
       </body>
