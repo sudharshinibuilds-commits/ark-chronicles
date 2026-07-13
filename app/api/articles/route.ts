@@ -3,10 +3,18 @@ import { adminClient, jsonError, requireAdmin } from '../_lib/server';
 
 export async function GET(req: NextRequest) {
   const db = adminClient();
+  const admin = await requireAdmin(req);
   const q = req.nextUrl.searchParams.get('q')?.trim();
   const category = req.nextUrl.searchParams.get('category')?.trim();
+  const includeUnpublished = req.nextUrl.searchParams.get('include_unpublished') === "true" && admin;
   const limit = Math.min(Number(req.nextUrl.searchParams.get('limit') || 30), 100);
-  let query = db.from('articles').select('*').eq('published', true).order('published_at', { ascending: false }).limit(limit);
+  
+  let query = db.from('articles').select('*');
+  if (!includeUnpublished) {
+    query = query.eq('published', true);
+  }
+  query = query.order('published_at', { ascending: false }).limit(limit);
+  
   if (category) query = query.eq('category', category);
   if (q) query = query.or(`title.ilike.%${q}%,excerpt.ilike.%${q}%,content.ilike.%${q}%`);
   const { data, error } = await query;

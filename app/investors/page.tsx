@@ -4,7 +4,9 @@ import AudioPlayer from "../components/AudioPlayer";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import LiveTicker from "../components/LiveTicker";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import { Briefcase, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function InvestorsPage() {
   const currentDate = new Intl.DateTimeFormat("en-IN", {
@@ -14,16 +16,127 @@ export default function InvestorsPage() {
     year: "numeric",
   }).format(new Date());
 
+  const [investors, setInvestors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [selectedInvestor, setSelectedInvestor] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
 
-  const investors = [
-    { id: "1", name: "Aditya Vora", fund: "Vertex Ventures India", interests: ["AI/ML", "SaaS", "Fintech"], ticket: "$500K - $2M" },
-    { id: "2", name: "Ritu Sharma", fund: "Blume Ventures", interests: ["Consumer", "HealthTech", "EdTech"], ticket: "$250K - $1M" },
-    { id: "3", name: "Sameer Bhat", fund: "Accel India", interests: ["Enterprise", "DeepTech", "Climate"], ticket: "$1M - $5M" },
-    { id: "4", name: "Leena Prakash", fund: "Sequoia Surge", interests: ["B2B", "Logistics", "Manufacturing"], ticket: "$1M - $3M" },
-    { id: "5", name: "Vikram Mehta", fund: "Lightspeed India", interests: ["Consumer", "Fintech", "Marketplaces"], ticket: "$500K - $3M" },
-    { id: "6", name: "Priya Nair", fund: "Elevation Capital", interests: ["HealthTech", "Biotech", "MedTech"], ticket: "$2M - $10M" },
+  // Form State
+  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    startup_name: "",
+    stage: "Seed",
+    ask: "",
+    pitch: "",
+  });
+
+  const fallbackInvestors = [
+    { id: "18bdfa3c-8b83-4ee2-bb53-62ef9295ff62", name: "Aditya Vora", fund: "Vertex Ventures India", interests: ["AI/ML", "SaaS", "Fintech"], ticket: "$500K - $2M" },
+    { id: "27faac90-c651-4043-b9db-bc2456f91f7a", name: "Ritu Sharma", fund: "Blume Ventures", interests: ["Consumer", "HealthTech", "EdTech"], ticket: "$250K - $1M" },
+    { id: "3f33cc8e-3243-470a-8bfd-38439df91003", name: "Sameer Bhat", fund: "Accel India", interests: ["Enterprise", "DeepTech", "Climate"], ticket: "$1M - $5M" },
+    { id: "4622dfab-a49e-4fa0-82aa-cda3dfbc2a2a", name: "Leena Prakash", fund: "Sequoia Surge", interests: ["B2B", "Logistics", "Manufacturing"], ticket: "$1M - $3M" },
+    { id: "51dfa3a9-b391-4cf1-8d2a-c283ffb252df", name: "Vikram Mehta", fund: "Lightspeed India", interests: ["Consumer", "Fintech", "Marketplaces"], ticket: "$500K - $3M" },
+    { id: "6c2da392-4f32-47a3-abef-cd82ffba23ef", name: "Priya Nair", fund: "Elevation Capital", interests: ["HealthTech", "Biotech", "MedTech"], ticket: "$2M - $10M" },
   ];
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user || null);
+
+        // Fetch user profiles who are registered as investors
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("role", "investor");
+
+        if (!error && data && data.length > 0) {
+          const formatted = data.map((p, index) => ({
+            id: p.id,
+            name: p.name || "Anonymous Investor",
+            fund: p.bio || "Ecosystem Angel Fund",
+            interests: p.interests && p.interests.length > 0 ? p.interests : ["DeepTech", "SaaS"],
+            ticket: "$100K - $1M",
+          }));
+          setInvestors(formatted);
+        } else {
+          // Sync fallback profiles into profiles table so database lookups succeed
+          for (const fallback of fallbackInvestors) {
+            await supabase.from("profiles").upsert({
+              id: fallback.id,
+              name: fallback.name,
+              bio: fallback.fund,
+              interests: fallback.interests,
+              role: "investor",
+            }, { onConflict: "id" });
+          }
+          setInvestors(fallbackInvestors);
+        }
+      } catch (err) {
+        console.error("Failed to fetch investors list", err);
+        setInvestors(fallbackInvestors);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const handleConnectClick = (investor: any) => {
+    if (!user) {
+      alert("Please login or create an account to initiate pitch connections.");
+      return;
+    }
+    setSelectedInvestor(investor);
+    setShowModal(true);
+  };
+
+  const handleSubmitPitch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedInvestor || !user) return;
+
+    setSubmitting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      const res = await fetch("/api/investor-requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          investor_id: selectedInvestor.id,
+          startup_name: formData.startup_name,
+          stage: formData.stage,
+          ask: formData.ask,
+          pitch: formData.pitch,
+        }),
+      });
+
+      if (res.ok) {
+        alert(`Your connection request with ${selectedInvestor.name} has been submitted! Our bridge team will schedule details shortly.`);
+        setFormData({
+          startup_name: "",
+          stage: "Seed",
+          ask: "",
+          pitch: "",
+        });
+        setShowModal(false);
+      } else {
+        const err = await res.json();
+        alert(`Failed to submit connection pitch: ${err.error || "Please try again."}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error logging request. Please check your connection.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#faf9f6]">
@@ -33,9 +146,11 @@ export default function InvestorsPage() {
           { label: "Home", href: "/" },
           { label: "Chronicles", href: "/chronicles" },
           { label: "Founders", href: "/founders" },
+          { label: "Magazines", href: "/magazines" },
           { label: "Research", href: "/research" },
           { label: "Investors", href: "/investors" },
           { label: "Opportunities", href: "/opportunities" },
+          { label: "College Collabs", href: "/college-collabs" },
           { label: "Submit Story", href: "/submit-story" },
           { label: "About Us", href: "/about" },
         ]}
@@ -48,144 +163,181 @@ export default function InvestorsPage() {
       />
       <LiveTicker
         items={[
-          "Zyra Bio closes a $14M seed round to scale climate-first materials for advanced manufacturing.",
-          "Founders in Bengaluru launch a cross-border fintech rail for emerging market exporters.",
-          "ARK Research briefs investors on AI-native industrial software and deep-tech resilience.",
-          "Mumbai mobility startup reports 3x retention growth after rolling out community-led fleet financing.",
-          "Delhi health-tech collective opens applications for its women-led diagnostics accelerator cohort.",
+          "INVESTORS: Matchmaking system online. Express interest to trigger direct deal routing.",
+          "BRIDGE PROTOCOL: Verify matching criteria. A 2% bridge fee applies to successful rounds.",
         ]}
       />
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <h1 className="font-display text-5xl font-bold text-ark-black">Investor Network</h1>
         
-        <div className="mt-6 grid grid-cols-3 gap-4 rounded-2xl border border-ark-navy/20 bg-ark-navy/5 p-6 sm:grid-cols-6">
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">₹4500Cr</div>
-            <div className="mt-1 text-sm text-zinc-600">Total AUM</div>
+        <div className="mt-6 grid grid-cols-3 gap-4 rounded-3xl border border-ark-navy/20 bg-ark-navy/5 p-6 sm:grid-cols-6 shadow-sm">
+          <div className="text-center p-2">
+            <div className="font-display text-2xl sm:text-3xl font-black text-ark-navy">₹4500Cr</div>
+            <div className="mt-1 text-[11px] font-bold text-zinc-500 uppercase tracking-wider leading-none">Total AUM</div>
           </div>
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">120+</div>
-            <div className="mt-1 text-sm text-zinc-600">Verified Angels</div>
+          <div className="text-center p-2">
+            <div className="font-display text-2xl sm:text-3xl font-black text-ark-navy">120+</div>
+            <div className="mt-1 text-[11px] font-bold text-zinc-500 uppercase tracking-wider leading-none">Verified Angels</div>
           </div>
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">45</div>
-            <div className="mt-1 text-sm text-zinc-600">VC Funds</div>
+          <div className="text-center p-2">
+            <div className="font-display text-2xl sm:text-3xl font-black text-[#1B2A6B]">45</div>
+            <div className="mt-1 text-[11px] font-bold text-zinc-500 uppercase tracking-wider leading-none">VC Funds</div>
           </div>
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">850+</div>
-            <div className="mt-1 text-sm text-zinc-600">Deals Closed</div>
+          <div className="text-center p-2">
+            <div className="font-display text-2xl sm:text-3xl font-black text-[#1B2A6B]">850+</div>
+            <div className="mt-1 text-[11px] font-bold text-zinc-500 uppercase tracking-wider leading-none">Deals Closed</div>
           </div>
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">28</div>
-            <div className="mt-1 text-sm text-zinc-600">Cities Covered</div>
+          <div className="text-center p-2">
+            <div className="font-display text-2xl sm:text-3xl font-black text-ark-navy">28</div>
+            <div className="mt-1 text-[11px] font-bold text-zinc-500 uppercase tracking-wider leading-none">Cities Covered</div>
           </div>
-          <div className="text-center">
-            <div className="font-display text-3xl font-bold text-ark-navy">92%</div>
-            <div className="mt-1 text-sm text-zinc-600">Success Rate</div>
+          <div className="text-center p-2">
+            <div className="font-display text-2xl sm:text-3xl font-black text-ark-gold">92%</div>
+            <div className="mt-1 text-[11px] font-bold text-zinc-500 uppercase tracking-wider leading-none">Success Rate</div>
           </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {investors.map((investor) => (
-            <div
-              key={investor.id}
-              className="overflow-hidden rounded-2xl border border-black/8 bg-white p-6 shadow-lg transition-all duration-150 hover:scale-[1.02] hover:shadow-xl"
-            >
-              <div className="flex items-center gap-4">
-                <div className="relative h-20 w-20 overflow-hidden rounded-full ring-4 ring-ark-gold/20">
-                  <img
-                    src={`https://picsum.photos/seed/inv-${investor.id}/300/300`}
-                    alt={investor.name}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div>
-                  <h3 className="font-display text-xl font-bold text-ark-black">{investor.name}</h3>
-                  <p className="mt-1 text-sm font-medium text-ark-navy">{investor.fund}</p>
-                </div>
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {investor.interests.map((interest) => (
-                  <span
-                    key={interest}
-                    className="rounded-full bg-ark-navy px-3 py-1.5 text-xs font-semibold text-white"
-                  >
-                    {interest}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-4">
-                <span className="text-sm font-semibold text-zinc-600">Ticket Size:</span>
-                <span className="ml-2 text-sm font-bold text-ark-navy">{investor.ticket}</span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setShowModal(true)}
-                className="mt-4 w-full rounded-full border-2 border-ark-navy px-4 py-2.5 text-sm font-semibold text-ark-navy transition-all duration-150 hover:scale-105 hover:bg-ark-navy hover:text-white"
+        {loading ? (
+          <div className="mt-12 text-center py-20 bg-white rounded-3xl border border-black/5">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-ark-navy border-t-transparent" />
+            <p className="text-xs text-zinc-500 mt-3 font-bold animate-pulse uppercase">Syncing Investor Matrix...</p>
+          </div>
+        ) : (
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {investors.map((investor) => (
+              <div
+                key={investor.id}
+                className="overflow-hidden rounded-3xl border border-black/8 bg-white p-6 shadow-lg transition-all duration-150 hover:scale-[1.01] hover:shadow-xl flex flex-col justify-between"
               >
-                I'm Interested
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+                <div>
+                  <div className="flex items-center gap-4">
+                    <div className="relative h-16 w-16 overflow-hidden rounded-full ring-4 ring-ark-gold/20 shrink-0">
+                      <img
+                        src={`https://picsum.photos/seed/inv-${investor.name}/200/200`}
+                        alt={investor.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-display text-lg font-black text-ark-black leading-snug">{investor.name}</h3>
+                      <p className="mt-0.5 text-xs font-bold text-[#1B2A6B] uppercase tracking-wider">{investor.fund}</p>
+                    </div>
+                  </div>
 
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-black/10 bg-white p-6 shadow-2xl">
-            <h2 className="font-display text-2xl font-bold text-ark-black">Express Interest</h2>
-            <form className="mt-6 space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-ark-black">Startup Name</label>
-                <input
-                  type="text"
-                  className="mt-1 w-full rounded-full border border-black/10 px-4 py-3 text-sm outline-none focus:border-ark-navy"
-                  placeholder="Your startup name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-ark-black">Stage</label>
-                <select className="mt-1 w-full rounded-full border border-black/10 px-4 py-3 text-sm outline-none focus:border-ark-navy">
-                  <option>Pre-seed</option>
-                  <option>Seed</option>
-                  <option>Series A</option>
-                  <option>Series B+</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-ark-black">Amount Seeking</label>
-                <input
-                  type="text"
-                  className="mt-1 w-full rounded-full border border-black/10 px-4 py-3 text-sm outline-none focus:border-ark-navy"
-                  placeholder="e.g., $500K"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-ark-black">Pitch</label>
-                <textarea
-                  rows={3}
-                  className="mt-1 w-full rounded-xl border border-black/10 px-4 py-3 text-sm outline-none focus:border-ark-navy"
-                  placeholder="Brief pitch about your startup..."
-                />
-              </div>
-              <p className="text-xs text-zinc-500">Note: 2% bridge fee applies on successful deals</p>
-              <div className="flex gap-3">
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {investor.interests.map((interest: string) => (
+                      <span
+                        key={interest}
+                        className="rounded-full bg-[#1B2A6B]/5 border border-[#1B2A6B]/15 px-2.5 py-1 text-[10px] font-bold text-[#1B2A6B] uppercase tracking-wider"
+                      >
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 text-xs">
+                    <span className="font-bold text-zinc-400 uppercase tracking-widest text-[10px]">Ticket Size:</span>
+                    <span className="ml-2 font-black text-ark-navy">{investor.ticket}</span>
+                  </div>
+                </div>
+
                 <button
                   type="button"
+                  onClick={() => handleConnectClick(investor)}
+                  className="mt-6 w-full rounded-full border-2 border-ark-navy px-4 py-2.5 text-xs font-bold text-ark-navy uppercase tracking-wider transition-all duration-150 hover:bg-[#1B2A6B] hover:border-[#1B2A6B] hover:text-white"
+                >
+                  I'm Interested
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {showModal && selectedInvestor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-3xl border border-black/10 bg-white p-7 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#1B2A6B]/10 px-3 py-1 text-[11px] font-bold text-[#1B2A6B] uppercase tracking-wider mb-2">
+              <Briefcase className="h-3 w-3 animate-pulse" /> Express Pitch Interest
+            </span>
+            <h2 className="font-display text-2xl font-black text-ark-black leading-tight">
+              Pitch to {selectedInvestor.name}
+            </h2>
+            <p className="text-xs text-zinc-500 mt-1">
+              Provide your details to initiate a secure investment bridge pass.
+            </p>
+
+            <form onSubmit={handleSubmitPitch} className="mt-5 space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Startup / Company Name</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.startup_name}
+                  onChange={e => setFormData({ ...formData, startup_name: e.target.value })}
+                  className="w-full rounded-xl border border-black/10 px-4 py-2.5 text-sm outline-none focus:border-[#1B2A6B]"
+                  placeholder="e.g. PulseForge AI"
+                />
+              </div>
+              <div className="grid gap-4 grid-cols-2">
+                <div>
+                  <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Funding Stage</label>
+                  <select
+                    value={formData.stage}
+                    onChange={e => setFormData({ ...formData, stage: e.target.value })}
+                    className="w-full rounded-xl border border-black/10 px-4 py-2.5 text-sm outline-none focus:border-[#1B2A6B] bg-white font-bold"
+                  >
+                    <option>Pre-seed</option>
+                    <option>Seed</option>
+                    <option>Series A</option>
+                    <option>Series B+</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Target Ask Amount</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.ask}
+                    onChange={e => setFormData({ ...formData, ask: e.target.value })}
+                    className="w-full rounded-xl border border-black/10 px-4 py-2.5 text-sm outline-none focus:border-[#1B2A6B]"
+                    placeholder="e.g. $500K"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Brief Elevator Pitch</label>
+                <textarea
+                  required
+                  rows={3}
+                  value={formData.pitch}
+                  onChange={e => setFormData({ ...formData, pitch: e.target.value })}
+                  className="w-full rounded-xl border border-black/10 px-4 py-2.5 text-sm outline-none focus:border-[#1B2A6B]"
+                  placeholder="Explain what major breakthrough you are building and current milestones..."
+                />
+              </div>
+              
+              <div className="p-3 bg-amber-500/5 rounded-xl border border-amber-500/10 text-[10px] text-amber-800 leading-normal flex gap-1.5 items-start">
+                <AlertCircle className="h-4 w-4 shrink-0 text-amber-700 mt-0.5" />
+                <span>Note: A 2% bridge assistance advisory fee applies on successful deal closures.</span>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  disabled={submitting}
                   onClick={() => setShowModal(false)}
-                  className="flex-1 rounded-full border border-black/10 px-4 py-3 text-sm font-semibold text-ark-black transition-all duration-150 hover:bg-black/5"
+                  className="flex-1 rounded-full border border-black/10 px-4 py-2.5 text-xs font-bold text-zinc-650 hover:bg-zinc-50 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 rounded-full bg-ark-navy px-4 py-3 text-sm font-semibold text-white transition-all duration-150 hover:bg-[#22378c]"
+                  disabled={submitting}
+                  className="flex-1 rounded-full bg-[#1B2A6B] px-4 py-2.5 text-xs font-bold text-white shadow-lg disabled:opacity-50"
                 >
-                  Submit
+                  {submitting ? "Routing..." : "Submit Pitch"}
                 </button>
               </div>
             </form>
