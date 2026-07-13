@@ -1,0 +1,3 @@
+import{NextRequest}from'next/server';import{adminClient,jsonError,requireAdmin}from'../_lib/server';
+export async function GET(){const{data,error}=await adminClient().from('magazines').select('*').eq('published',true).order('published_at',{ascending:false});return error?jsonError(error.message,500):Response.json(data)}
+export async function POST(req:NextRequest){if(!await requireAdmin(req))return jsonError('Admin access required',403);const b=await req.json();const{data,error}=await adminClient().from('magazines').insert({...b,published:true,published_at:new Date().toISOString()}).select().single();return error?jsonError(error.message,500):Response.json(data,{status:201})}
